@@ -16,13 +16,15 @@ int main(int argc, char **argv) {
   long double x, y, distance_squared, pi_estimate, pi2, fi_pi;
   double time1, time2;
 
+  // Get number of tosses as command-line argument
   tosses = atoi(argv[1]);
   srand(time(NULL));
 
+  // Create 10 number of threads for following code-block
   #pragma omp parallel num_threads(10)
   {
     if (omp_get_thread_num() == 0)
-      time1 = omp_get_wtime();
+      time1 = omp_get_wtime();  // Note the start time
 
     for (toss = 0; toss < tosses; toss++) {
       x = (long double)rand() / RAND_MAX * 2.0 - 1;
@@ -32,14 +34,14 @@ int main(int argc, char **argv) {
 
       if (distance_squared <= 1) {
         #pragma omp critical
-        number_in_circle++;
+        number_in_circle++; // Critical section for atomic updates
       }
     }
 
     printf("Number of threads: %d\n", omp_get_num_threads());
 
     if (omp_get_thread_num() == 0) {
-      time2 = omp_get_wtime();
+      time2 = omp_get_wtime();  // Note the end time
       printf("\nWork time in seconds: %f", time2 - time1);
     }
   }
